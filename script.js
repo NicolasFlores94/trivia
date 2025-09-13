@@ -1,3 +1,5 @@
+import { collection, addDoc, updateDoc, getDocs, query, where, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
 // ===================== VARIABLES =====================
 const questions = [
   { question: "¿Cóctel famoso con ron, menta y soda?", options: ["Caipirinha","Mojito","Margarita"], answer: "Mojito" },
@@ -54,16 +56,13 @@ function selectAnswer(option) {
   if(option === correct){
     nextBtn.disabled = false;
     alert("¡Correcto! Presiona 'Siguiente' para continuar o gira la ruleta.");
-  } else {
-    alert("Incorrecto, inténtalo de nuevo.");
-  }
+  } else alert("Incorrecto, inténtalo de nuevo.");
 }
 
 nextBtn.onclick = () => {
   currentQuestion++;
-  if(currentQuestion < questions.length){
-    loadQuestion();
-  } else {
+  if(currentQuestion < questions.length) loadQuestion();
+  else {
     gameSection.classList.add("hidden");
     rouletteSection.classList.remove("hidden");
   }
@@ -71,7 +70,8 @@ nextBtn.onclick = () => {
 
 // ===================== RULETA =====================
 function drawRoulette() {
-  for(let i=0; i<numSectors; i++){
+  ctx.clearRect(0,0,400,400);
+  for(let i=0;i<numSectors;i++){
     ctx.beginPath();
     ctx.moveTo(200,200);
     ctx.arc(200,200,200,startAngle + i*sectorAngle, startAngle + (i+1)*sectorAngle);
@@ -83,11 +83,20 @@ function drawRoulette() {
     ctx.translate(200,200);
     ctx.rotate(startAngle + i*sectorAngle + sectorAngle/2);
     ctx.textAlign = "right";
-    ctx.fillStyle="#000";
-    ctx.font = "18px Arial";
-    ctx.fillText(prizes[i],190,0);
+    ctx.fillStyle = "#000";
+    ctx.font = "bold 18px Arial";
+    ctx.fillText(prizes[i], 180, 0);
     ctx.restore();
   }
+
+  // Indicador fijo arriba
+  ctx.fillStyle = "#ff0000";
+  ctx.beginPath();
+  ctx.moveTo(200-10,10);
+  ctx.lineTo(200+10,10);
+  ctx.lineTo(200,30);
+  ctx.closePath();
+  ctx.fill();
 }
 drawRoulette();
 
@@ -102,13 +111,12 @@ spinBtn.onclick = () => {
     if(!start) start = timestamp;
     const progress = timestamp - start;
     const rotation = startAngle + (finalAngle - startAngle)*(progress/3000);
-    ctx.clearRect(0,0,400,400);
     startAngle = rotation % (2*Math.PI);
+
     drawRoulette();
 
-    if(progress < 3000){
-      requestAnimationFrame(animate);
-    } else {
+    if(progress < 3000) requestAnimationFrame(animate);
+    else {
       const index = Math.floor((2*Math.PI - startAngle + sectorAngle/2)/(2*Math.PI)*numSectors) % numSectors;
       const wonPrize = prizes[index];
 
@@ -118,17 +126,13 @@ spinBtn.onclick = () => {
       prizeEl.textContent = `¡Tu premio es: ${wonPrize}!`;
       prizeEl.dataset.prize = wonPrize;
 
-      // Confetti y sonido según premio
-      let color="#FFD700"; // dorado por defecto
-      let soundEl = winGold;
+      let color="#FFD700", soundEl=winGold;
       if(wonPrize.includes("10%")) { color="#00f"; soundEl=winBlue; }
       else if(wonPrize.includes("2x1")) { color="#0f0"; soundEl=winGreen; }
       else if(wonPrize.includes("Copa")) { color="#ff69b4"; soundEl=winPink; }
 
       soundEl.play();
-
-      confetti({ particleCount: 200, spread: 120, startVelocity: 50, gravity: 0.8, scalar: 1.5, colors: [color,"#fff"] });
-
+      confetti({ particleCount: 250, spread: 140, startVelocity: 60, gravity: 0.9, scalar: 1.7, colors: [color,"#fff"] });
       showRanking();
       spinBtn.disabled = false;
     }
@@ -150,11 +154,11 @@ saveBtn.onclick = async () => {
   const snapshot = await getDocs(q);
 
   if(snapshot.empty){
-    await addDoc(clientsRef, { name, score: 1, prizes: [prize], lastPrizeDate: new Date() });
+    await addDoc(clientsRef, { name, score:1, prizes:[prize], lastPrizeDate:new Date() });
   } else {
     const docRef = snapshot.docs[0].ref;
     const data = snapshot.docs[0].data();
-    await updateDoc(docRef, { score: data.score + 1, prizes: [...data.prizes, prize], lastPrizeDate: new Date() });
+    await updateDoc(docRef, { score: data.score+1, prizes:[...data.prizes, prize], lastPrizeDate:new Date() });
   }
 
   alert("Premio guardado y puntos actualizados!");

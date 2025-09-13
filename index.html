@@ -79,33 +79,8 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     window.db = db;
-
-    window.saveClient = async function(name, prize) {
-      const clientsRef = collection(db, "clientes");
-      const q = query(clientsRef, where("name","==",name));
-      const snapshot = await getDocs(q);
-
-      if(snapshot.empty){
-        await addDoc(clientsRef, { 
-          name, 
-          score: 1, 
-          prizes: [prize], 
-          lastPrizeDate: new Date() 
-        });
-      } else {
-        const docRef = snapshot.docs[0].ref;
-        const data = snapshot.docs[0].data();
-        await updateDoc(docRef, {
-          score: data.score + 1,
-          prizes: [...data.prizes, prize],
-          lastPrizeDate: new Date()
-        });
-      }
-      alert("Premio guardado y puntos actualizados!");
-      showRanking();
-    };
   </script>
 
-  <script src="script.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>

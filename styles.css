@@ -1,5 +1,6 @@
+/* ===================== GLOBAL ===================== */
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Arial', sans-serif;
   background: linear-gradient(135deg, #ff9d6c, #ff6c9d);
   color: #fff;
   margin: 0;
@@ -7,48 +8,138 @@ body {
   text-align: center;
 }
 
-header { background: rgba(0,0,0,0.4); padding: 20px; }
-h1 { font-size: 2rem; margin: 0; }
-main { padding: 30px; }
-
-#game, #rouletteSection, #result, #rankingSection {
-  background: rgba(0,0,0,0.6);
-  border-radius: 15px;
-  padding: 20px;
-  margin: auto;
-  max-width: 500px;
+header {
+  background: rgba(0,0,0,0.5);
+  padding: 25px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.4);
 }
 
+h1 {
+  font-size: 2.2rem;
+  margin: 0;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px #000;
+}
+
+main {
+  padding: 30px 15px;
+}
+
+/* ===================== SECCIONES ===================== */
+#game, #rouletteSection, #result, #rankingSection {
+  background: rgba(0,0,0,0.6);
+  border-radius: 20px;
+  padding: 25px;
+  margin: 25px auto;
+  max-width: 520px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+  transition: transform 0.3s;
+}
+#game:hover, #rouletteSection:hover, #result:hover, #rankingSection:hover {
+  transform: scale(1.02);
+}
+
+/* ===================== BOTONES ===================== */
 button {
-  background: #ffcc00;
+  background: linear-gradient(45deg, #ffd700, #ffa500);
   border: none;
-  padding: 10px 20px;
+  padding: 12px 25px;
   margin: 10px;
   font-size: 1rem;
   font-weight: bold;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
-button:hover { transform: scale(1.1); }
+button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
 
-.hidden { display: none; }
-
+/* ===================== OPCIONES ===================== */
 .option {
   display: block;
   background: #fff;
   color: #333;
   margin: 8px auto;
-  padding: 10px;
-  border-radius: 8px;
+  padding: 12px;
+  border-radius: 10px;
   cursor: pointer;
-  max-width: 300px;
-  transition: background 0.3s;
+  max-width: 320px;
+  font-weight: bold;
+  transition: background 0.3s, transform 0.2s;
 }
-.option:hover { background: #ffd700; }
+.option:hover {
+  background: #ffd700;
+  transform: scale(1.05);
+}
 
-#roulette { position: relative; }
-#rouletteCanvas { margin: 20px auto; display: block; background: #fff; border-radius: 50%; }
+/* ===================== RULETA ===================== */
+#roulette {
+  position: relative;
+}
+#rouletteCanvas {
+  margin: 20px auto;
+  display: block;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+  transition: transform 0.3s;
+}
+#spinBtn {
+  margin-top: 20px;
+  font-size: 1.1rem;
+  padding: 12px 30px;
+}
 
-input { padding: 8px; border-radius: 8px; border: none; margin-top: 10px; }
+/* ===================== INPUT ===================== */
+input {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: none;
+  margin-top: 12px;
+  font-size: 1rem;
+  text-align: center;
+  max-width: 250px;
+}
+
+/* ===================== LISTAS ===================== */
+ul {
+  list-style: none;
+  padding: 0;
+}
+ul li {
+  background: rgba(255,255,255,0.2);
+  padding: 8px 12px;
+  margin: 6px auto;
+  border-radius: 8px;
+  max-width: 350px;
+  font-weight: bold;
+  transition: transform 0.2s;
+}
+ul li:hover {
+  transform: scale(1.03);
+}
+
+/* ===================== CLASES UTILES ===================== */
+.hidden { display: none; }
+
+/* ===================== FOOTER ===================== */
+footer {
+  margin-top: 40px;
+  padding: 15px;
+  background: rgba(0,0,0,0.5);
+  box-shadow: 0 -4px 10px rgba(0,0,0,0.3);
+  font-size: 0.9rem;
+}
+
+/* ===================== ANIMACIONES ===================== */
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-15px); }
+  60% { transform: translateY(-7px); }
+}
+#spinBtn {
+  animation: bounce 2s infinite;
+}
+
