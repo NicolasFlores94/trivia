@@ -57,7 +57,10 @@
 
   <!-- Sonidos -->
   <audio id="spinSound" src="sounds/spin.mp3"></audio>
-  <audio id="winSound" src="sounds/win.mp3"></audio>
+  <audio id="winGold" src="sounds/win_gold.mp3"></audio>
+  <audio id="winBlue" src="sounds/win_blue.mp3"></audio>
+  <audio id="winGreen" src="sounds/win_green.mp3"></audio>
+  <audio id="winPink" src="sounds/win_pink.mp3"></audio>
 
   <!-- Firebase SDK -->
   <script type="module">
@@ -83,7 +86,6 @@
       const snapshot = await getDocs(q);
 
       if(snapshot.empty){
-        // Nuevo jugador
         await addDoc(clientsRef, { 
           name, 
           score: 1, 
@@ -91,7 +93,6 @@
           lastPrizeDate: new Date() 
         });
       } else {
-        // Actualizar jugador existente
         const docRef = snapshot.docs[0].ref;
         const data = snapshot.docs[0].data();
         await updateDoc(docRef, {
@@ -100,7 +101,6 @@
           lastPrizeDate: new Date()
         });
       }
-
       alert("Premio guardado y puntos actualizados!");
       showRanking();
     };

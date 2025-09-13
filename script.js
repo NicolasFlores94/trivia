@@ -1,4 +1,4 @@
-// ===================== TRIVIA =====================
+// ===================== VARIABLES =====================
 const questions = [
   { question: "¿Cóctel famoso con ron, menta y soda?", options: ["Caipirinha","Mojito","Margarita"], answer: "Mojito" },
   { question: "Bebida con tequila, triple sec y limón?", options: ["Piña Colada","Margarita","Negroni"], answer: "Margarita" },
@@ -24,7 +24,10 @@ const canvas = document.getElementById("rouletteCanvas");
 const ctx = canvas.getContext("2d");
 
 const spinSound = document.getElementById("spinSound");
-const winSound = document.getElementById("winSound");
+const winGold = document.getElementById("winGold");
+const winBlue = document.getElementById("winBlue");
+const winGreen = document.getElementById("winGreen");
+const winPink = document.getElementById("winPink");
 
 const numSectors = prizes.length;
 const sectorAngle = 2 * Math.PI / numSectors;
@@ -36,6 +39,7 @@ function loadQuestion() {
   questionEl.textContent = q.question;
   optionsEl.innerHTML = "";
   nextBtn.disabled = true;
+
   q.options.forEach(opt => {
     const btn = document.createElement("button");
     btn.textContent = opt;
@@ -48,8 +52,8 @@ function loadQuestion() {
 function selectAnswer(option) {
   const correct = questions[currentQuestion].answer;
   if(option === correct){
-    gameSection.classList.add("hidden");
-    rouletteSection.classList.remove("hidden");
+    nextBtn.disabled = false;
+    alert("¡Correcto! Presiona 'Siguiente' para continuar o gira la ruleta.");
   } else {
     alert("Incorrecto, inténtalo de nuevo.");
   }
@@ -101,22 +105,101 @@ spinBtn.onclick = () => {
     ctx.clearRect(0,0,400,400);
     startAngle = rotation % (2*Math.PI);
     drawRoulette();
-    if(progress<3000){
+
+    if(progress < 3000){
       requestAnimationFrame(animate);
     } else {
       const index = Math.floor((2*Math.PI - startAngle + sectorAngle/2)/(2*Math.PI)*numSectors) % numSectors;
       const wonPrize = prizes[index];
+
       rouletteSection.classList.add("hidden");
       resultSection.classList.remove("hidden");
       rankingSection.classList.remove("hidden");
       prizeEl.textContent = `¡Tu premio es: ${wonPrize}!`;
       prizeEl.dataset.prize = wonPrize;
-      winSound.play();
-      confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+
+      // Confetti y sonido según premio
+      let color="#FFD700"; // dorado por defecto
+      let soundEl = winGold;
+      if(wonPrize.includes("10%")) { color="#00f"; soundEl=winBlue; }
+      else if(wonPrize.includes("2x1")) { color="#0f0"; soundEl=winGreen; }
+      else if(wonPrize.includes("Copa")) { color="#ff69b4"; soundEl=winPink; }
+
+      soundEl.play();
+
+      confetti({ particleCount: 200, spread: 120, startVelocity: 50, gravity: 0.8, scalar: 1.5, colors: [color,"#fff"] });
+
       showRanking();
       spinBtn.disabled = false;
     }
   }
 
-  requestAnimationFrame()
+  requestAnimationFrame(animate);
+};
+
+// ===================== GUARDAR CLIENTE =====================
+const saveBtn = document.getElementById("saveBtn");
+saveBtn.onclick = async () => {
+  const name = document.getElementById("clientName").value.trim();
+  const prize = prizeEl.dataset.prize;
+  if(!name){ alert("Ingresa tu nombre"); return; }
+
+  const db = window.db;
+  const clientsRef = collection(db, "clientes");
+  const q = query(clientsRef, where("name","==",name));
+  const snapshot = await getDocs(q);
+
+  if(snapshot.empty){
+    await addDoc(clientsRef, { name, score: 1, prizes: [prize], lastPrizeDate: new Date() });
+  } else {
+    const docRef = snapshot.docs[0].ref;
+    const data = snapshot.docs[0].data();
+    await updateDoc(docRef, { score: data.score + 1, prizes: [...data.prizes, prize], lastPrizeDate: new Date() });
   }
+
+  alert("Premio guardado y puntos actualizados!");
+  showRanking();
+};
+
+// ===================== RANKING =====================
+function showRanking() {
+  const db = window.db;
+  rankingList.innerHTML="";
+  historyList.innerHTML="";
+
+  const q = query(collection(db,"clientes"), orderBy("score","desc"), limit(10));
+  onSnapshot(q, snapshot=>{
+    rankingList.innerHTML="";
+    snapshot.forEach(doc=>{
+      const data=doc.data();
+      const li=document.createElement("li");
+      li.textContent=`${data.name} - ${data.score} puntos (${data.prizes.length} premios)`;
+      rankingList.appendChild(li);
+    });
+  });
+
+  const q2 = query(collection(db,"clientes"), orderBy("lastPrizeDate","desc"), limit(5));
+  onSnapshot(q2, snapshot=>{
+    historyList.innerHTML="";
+    snapshot.forEach(doc=>{
+      const data=doc.data();
+      const lastPrize=data.prizes[data.prizes.length-1];
+      const li=document.createElement("li");
+      li.textContent=`${data.name} ganó: ${lastPrize}`;
+      historyList.appendChild(li);
+    });
+  });
+}
+
+// ===================== RESTART =====================
+function restartGame(){
+  currentQuestion=0;
+  gameSection.classList.remove("hidden");
+  rouletteSection.classList.add("hidden");
+  resultSection.classList.add("hidden");
+  rankingSection.classList.add("hidden");
+  loadQuestion();
+}
+
+// ===================== INICIAR =====================
+loadQuestion();
