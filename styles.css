@@ -7,22 +7,12 @@ body {
   text-align: center;
 }
 
-header {
-  background: rgba(0, 0, 0, 0.4);
-  padding: 20px;
-}
+header { background: rgba(0,0,0,0.4); padding: 20px; }
+h1 { font-size: 2rem; margin: 0; }
+main { padding: 30px; }
 
-h1 {
-  font-size: 2rem;
-  margin: 0;
-}
-
-main {
-  padding: 30px;
-}
-
-#game, #result {
-  background: rgba(0, 0, 0, 0.6);
+#game, #rouletteSection, #result, #rankingSection {
+  background: rgba(0,0,0,0.6);
   border-radius: 15px;
   padding: 20px;
   margin: auto;
@@ -41,14 +31,9 @@ button {
   cursor: pointer;
   transition: transform 0.2s;
 }
+button:hover { transform: scale(1.1); }
 
-button:hover {
-  transform: scale(1.1);
-}
-
-.hidden {
-  display: none;
-}
+.hidden { display: none; }
 
 .option {
   display: block;
@@ -61,7 +46,9 @@ button:hover {
   max-width: 300px;
   transition: background 0.3s;
 }
+.option:hover { background: #ffd700; }
 
-.option:hover {
-  background: #ffd700;
-}
+#roulette { position: relative; }
+#rouletteCanvas { margin: 20px auto; display: block; background: #fff; border-radius: 50%; }
+
+input { padding: 8px; border-radius: 8px; border: none; margin-top: 10px; }

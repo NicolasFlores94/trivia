@@ -9,10 +9,11 @@
 <body>
   <header>
     <h1>🍹 Bienvenido a la Trivia del Bar 🍹</h1>
-    <p>Juega y gana premios mientras disfrutas.</p>
+    <p>Juega, gana premios y compite en el ranking.</p>
   </header>
 
   <main>
+    <!-- Trivia -->
     <section id="game">
       <h2>Pregunta:</h2>
       <p id="question"></p>
@@ -20,9 +21,29 @@
       <button id="nextBtn" disabled>Siguiente</button>
     </section>
 
+    <!-- Ruleta -->
+    <section id="rouletteSection" class="hidden">
+      <h2>🎉 ¡Gira la ruleta para tu premio! 🎉</h2>
+      <div id="roulette">
+        <canvas id="rouletteCanvas" width="400" height="400"></canvas>
+        <button id="spinBtn">Girar</button>
+      </div>
+    </section>
+
+    <!-- Resultado -->
     <section id="result" class="hidden">
-      <h2>🎉 ¡Ganaste! 🎉</h2>
+      <h2>🏆 ¡Premio obtenido! 🏆</h2>
       <p id="prize"></p>
+      <input type="text" id="clientName" placeholder="Ingresa tu nombre">
+      <button id="saveBtn">Guardar premio</button>
+    </section>
+
+    <!-- Ranking -->
+    <section id="rankingSection" class="hidden">
+      <h2>🏅 Ranking de jugadores</h2>
+      <ul id="rankingList"></ul>
+      <h3>🎁 Últimos premios otorgados</h3>
+      <ul id="historyList"></ul>
       <button onclick="restartGame()">Jugar de nuevo</button>
     </section>
   </main>
@@ -30,6 +51,60 @@
   <footer>
     <p>© 2025 Trivia del Bar. Todos los derechos reservados.</p>
   </footer>
+
+  <!-- Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- Sonidos -->
+  <audio id="spinSound" src="sounds/spin.mp3"></audio>
+  <audio id="winSound" src="sounds/win.mp3"></audio>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, doc, updateDoc, getDocs, query, where, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "TU_API_KEY",
+      authDomain: "TU_PROYECTO.firebaseapp.com",
+      projectId: "TU_PROYECTO",
+      storageBucket: "TU_PROYECTO.appspot.com",
+      messagingSenderId: "TU_SENDER_ID",
+      appId: "TU_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    window.db = db;
+
+    window.saveClient = async function(name, prize) {
+      const clientsRef = collection(db, "clientes");
+      const q = query(clientsRef, where("name","==",name));
+      const snapshot = await getDocs(q);
+
+      if(snapshot.empty){
+        // Nuevo jugador
+        await addDoc(clientsRef, { 
+          name, 
+          score: 1, 
+          prizes: [prize], 
+          lastPrizeDate: new Date() 
+        });
+      } else {
+        // Actualizar jugador existente
+        const docRef = snapshot.docs[0].ref;
+        const data = snapshot.docs[0].data();
+        await updateDoc(docRef, {
+          score: data.score + 1,
+          prizes: [...data.prizes, prize],
+          lastPrizeDate: new Date()
+        });
+      }
+
+      alert("Premio guardado y puntos actualizados!");
+      showRanking();
+    };
+  </script>
 
   <script src="script.js"></script>
 </body>
