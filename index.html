@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trivia del Bar 🍻</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>🍹 Bienvenido a la Trivia del Bar 🍹</h1>
+    <p>Juega y gana premios mientras disfrutas.</p>
+  </header>
+
+  <main>
+    <section id="game">
+      <h2>Pregunta:</h2>
+      <p id="question"></p>
+      <div id="options"></div>
+      <button id="nextBtn" disabled>Siguiente</button>
+    </section>
+
+    <section id="result" class="hidden">
+      <h2>🎉 ¡Ganaste! 🎉</h2>
+      <p id="prize"></p>
+      <button onclick="restartGame()">Jugar de nuevo</button>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 Trivia del Bar. Todos los derechos reservados.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
